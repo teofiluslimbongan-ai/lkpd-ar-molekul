@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>AR Scan — Bentuk Molekul</title>
+  <script src="https://cdn.jsdelivr.net/npm/aframe@1.5.0/dist/aframe.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
+  <style>
+    html, body { margin: 0; height: 100%; overflow: hidden; font-family: -apple-system,"Segoe UI",Calibri,Roboto,Arial,sans-serif; }
+    #overlay {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 999;
+      background: linear-gradient(180deg, rgba(31,56,100,0.92), rgba(31,56,100,0));
+      color: #fff; padding: 14px 16px 30px; pointer-events: none;
+    }
+    #overlay h1 { margin: 0 0 4px; font-size: 16px; }
+    #overlay p { margin: 0; font-size: 12.5px; color: #dbe6f5; }
+    #status {
+      position: fixed; bottom: 18px; left: 50%; transform: translateX(-50%);
+      background: rgba(0,0,0,0.65); color: #fff; padding: 8px 16px; border-radius: 20px;
+      font-size: 13px; z-index: 999; transition: opacity 0.3s;
+    }
+    a-scene { width: 100%; height: 100%; }
+  </style>
+</head>
+<body>
+  <div id="overlay">
+    <h1>🧪 AR Scan — Bentuk Molekul</h1>
+    <p>Arahkan kamera ke salah satu gambar molekul pada LKPD</p>
+  </div>
+  <div id="status">Mencari gambar molekul…</div>
+
+  <a-scene
+    mindar-image="imageTargetSrc: targets.mind; autoStart: true; uiScanning: no; uiLoading: no;"
+    color-space="sRGB"
+    renderer="colorManagement: true, physicallyCorrectLights"
+    vr-mode-ui="enabled: false"
+    device-orientation-permission-ui="enabled: true"
+    embedded>
+
+    <a-assets timeout="30000">
+      <a-asset-item id="model-h2o"  src="models/h2o.glb"></a-asset-item>
+      <a-asset-item id="model-nh3"  src="models/nh3.glb"></a-asset-item>
+      <a-asset-item id="model-co2"  src="models/co2.glb"></a-asset-item>
+      <a-asset-item id="model-ch4"  src="models/ch4.glb"></a-asset-item>
+      <a-asset-item id="model-pcl5" src="models/pcl5.glb"></a-asset-item>
+      <a-asset-item id="model-sf6"  src="models/sf6.glb"></a-asset-item>
+    </a-assets>
+
+    <a-camera position="0 0 0" look-controls="enabled: false" cursor="fuse: false" raycaster="near: 10; far: 10000;"></a-camera>
+
+    <a-light type="ambient" color="#ffffff" intensity="0.9"></a-light>
+    <a-light type="directional" color="#ffffff" intensity="0.6" position="1 2 1"></a-light>
+
+    <!-- target 0: H2O -->
+    <a-entity mindar-image-target="targetIndex: 0" data-name="Air (H₂O)">
+      <a-gltf-model rotation="90 0 0" position="0 0 0.05" scale="0.28 0.28 0.28" src="#model-h2o" animation="property: rotation; to: 90 360 0; loop: true; dur: 8000; easing: linear"></a-gltf-model>
+    </a-entity>
+
+    <!-- target 1: NH3 -->
+    <a-entity mindar-image-target="targetIndex: 1" data-name="Amonia (NH₃)">
+      <a-gltf-model rotation="90 0 0" position="0 0 0.05" scale="0.28 0.28 0.28" src="#model-nh3" animation="property: rotation; to: 90 360 0; loop: true; dur: 8000; easing: linear"></a-gltf-model>
+    </a-entity>
+
+    <!-- target 2: CO2 -->
+    <a-entity mindar-image-target="targetIndex: 2" data-name="Karbon dioksida (CO₂)">
+      <a-gltf-model rotation="90 0 0" position="0 0 0.05" scale="0.28 0.28 0.28" src="#model-co2" animation="property: rotation; to: 90 360 0; loop: true; dur: 8000; easing: linear"></a-gltf-model>
+    </a-entity>
+
+    <!-- target 3: CH4 -->
+    <a-entity mindar-image-target="targetIndex: 3" data-name="Metana (CH₄)">
+      <a-gltf-model rotation="90 0 0" position="0 0 0.05" scale="0.28 0.28 0.28" src="#model-ch4" animation="property: rotation; to: 90 360 0; loop: true; dur: 8000; easing: linear"></a-gltf-model>
+    </a-entity>
+
+    <!-- target 4: PCl5 -->
+    <a-entity mindar-image-target="targetIndex: 4" data-name="Fosforus pentaklorida (PCl₅)">
+      <a-gltf-model rotation="90 0 0" position="0 0 0.05" scale="0.24 0.24 0.24" src="#model-pcl5" animation="property: rotation; to: 90 360 0; loop: true; dur: 8000; easing: linear"></a-gltf-model>
+    </a-entity>
+
+    <!-- target 5: SF6 -->
+    <a-entity mindar-image-target="targetIndex: 5" data-name="Sulfur heksafluorida (SF₆)">
+      <a-gltf-model rotation="90 0 0" position="0 0 0.05" scale="0.24 0.24 0.24" src="#model-sf6" animation="property: rotation; to: 90 360 0; loop: true; dur: 8000; easing: linear"></a-gltf-model>
+    </a-entity>
+
+  </a-scene>
+
+  <script>
+    const statusEl = document.getElementById('status');
+    const targets = document.querySelectorAll('[mindar-image-target]');
+    targets.forEach(function (el) {
+      el.addEventListener('targetFound', function () {
+        statusEl.textContent = '✅ ' + el.getAttribute('data-name') + ' terdeteksi';
+      });
+      el.addEventListener('targetLost', function () {
+        statusEl.textContent = 'Mencari gambar molekul…';
+      });
+    });
+  </script>
+</body>
+</html>
