@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Viewer AR — Bentuk Molekul</title>
+<style>
+  :root { --navy:#1F3864; --blue:#2E5395; --lightblue:#DDEBF7; }
+  * { box-sizing:border-box; }
+  body { margin:0; font-family:-apple-system,"Segoe UI",Calibri,Roboto,Arial,sans-serif; background:#fff; color:#1a1a1a; }
+  .header { background:var(--navy); color:#fff; padding:18px; }
+  .header h1 { margin:0 0 4px; font-size:19px; }
+  .header p { margin:0; font-size:13px; color:#cfd9ea; }
+  .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:12px; padding:18px; }
+  a.card { text-decoration:none; color:#1a1a1a; border:1px solid #dfe4ea; border-radius:12px; padding:16px 12px; text-align:center; box-shadow:0 1px 3px rgba(0,0,0,0.06); }
+  a.card .n { font-weight:700; color:var(--navy); font-size:15px; }
+  a.card .f { font-size:13px; color:#555; margin-top:2px; }
+</style>
+</head>
+<body>
+  <div class="header">
+    <h1>🧪 Viewer AR — Bentuk Molekul</h1>
+    <p>Pilih molekul untuk melihat model 3D / AR-nya</p>
+  </div>
+  <div class="grid">
+    <a class="card" href="ar-ch4.html"><div class="n">Metana</div><div class="f">CH₄</div></a>
+    <a class="card" href="ar-nh3.html"><div class="n">Amonia</div><div class="f">NH₃</div></a>
+    <a class="card" href="ar-h2o.html"><div class="n">Air</div><div class="f">H₂O</div></a>
+    <a class="card" href="ar-co2.html"><div class="n">Karbon dioksida</div><div class="f">CO₂</div></a>
+    <a class="card" href="ar-pcl5.html"><div class="n">Fosforus pentaklorida</div><div class="f">PCl₅</div></a>
+    <a class="card" href="ar-sf6.html"><div class="n">Sulfur heksafluorida</div><div class="f">SF₆</div></a>
+  </div>
+</body>
+</html>
