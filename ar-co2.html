@@ -20,6 +20,18 @@
   .progress-bar { display:block; width:70%; height:5px; max-width:220px; border-radius:4px; background:rgba(0,0,0,0.1); position:absolute; bottom:14px; left:50%; transform:translateX(-50%); overflow:hidden; }
   .update-bar { background:var(--blue); width:0%; height:100%; }
   model-viewer[loaded] .progress-bar { display:none; }
+  .angle-badge {
+    background: #E8A33D;
+    color: #3a2600;
+    border: 2px solid #fff;
+    border-radius: 14px;
+    padding: 3px 10px;
+    font-size: 12px;
+    font-weight: 700;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.35);
+    white-space: nowrap;
+    cursor: default;
+  }
 </style>
 </head>
 <body>
@@ -41,6 +53,7 @@
     camera-orbit="25deg 75deg 2.2m">
     <button slot="ar-button" class="ar-btn">📱 Lihat dalam AR</button>
     <div class="progress-bar" slot="progress-bar"><div class="update-bar"></div></div>
+    <button class="angle-badge" slot="hotspot-angle-0" data-position="-0.0000 0.3180 0.0000" data-normal="0 1 0">180°</button>
   </model-viewer>
   <div class="info">
     <b>Bentuk molekul:</b> Linear<br>
