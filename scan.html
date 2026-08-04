@@ -105,21 +105,15 @@
 
       startBtn.textContent = 'Memuat pustaka AR…';
 
-      // 2. Load AFrame + MindAR from CDN, with fallback CDN if the first fails
+      // 2. Load AFrame + MindAR from the SAME site (no external CDN — avoids network/firewall blocks)
       try {
-        await loadScript('https://cdn.jsdelivr.net/npm/aframe@1.5.0/dist/aframe.min.js');
-        await loadScript('https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js');
+        await loadScript('lib/aframe.min.js');
+        await loadScript('lib/mindar-image-aframe.prod.js');
       } catch (err1) {
-        try {
-          showError('CDN utama gagal, mencoba CDN cadangan…');
-          await loadScript('https://unpkg.com/aframe@1.5.0/dist/aframe.min.js');
-          await loadScript('https://unpkg.com/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js');
-        } catch (err2) {
-          showError('Gagal memuat pustaka AR dari CDN. Periksa koneksi internet gawai. Detail: ' + err2.message);
-          startBtn.disabled = false;
-          startBtn.textContent = '📷 Coba Lagi';
-          return;
-        }
+        showError('Gagal memuat pustaka AR dari server ini. Pastikan folder <code>lib/</code> (aframe.min.js, mindar-image-aframe.prod.js) sudah diunggah ke repo GitHub. Detail: ' + err1.message);
+        startBtn.disabled = false;
+        startBtn.textContent = '📷 Coba Lagi';
+        return;
       }
 
       startBtn.textContent = 'Menyiapkan adegan AR…';
