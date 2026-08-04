@@ -19,6 +19,7 @@
       font-size: 13px; z-index: 999; transition: opacity 0.3s; max-width: 90%; text-align:center;
     }
     a-scene { width: 100%; height: 100%; }
+    #scene-container { position: fixed; inset: 0; width: 100%; height: 100%; }
 
     #start-screen {
       position: fixed; inset: 0; z-index: 1000;
@@ -90,22 +91,9 @@
 
     startBtn.addEventListener('click', async function () {
       startBtn.disabled = true;
-      startBtn.textContent = 'Memeriksa kamera…';
-
-      // 1. Explicitly request camera permission first, with a clear error if denied
-      try {
-        const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
-        stream.getTracks().forEach(t => t.stop()); // release, MindAR will request its own
-      } catch (err) {
-        showError('Izin kamera ditolak atau tidak tersedia: ' + err.message + '<br>Coba: buka menu situs (ikon gembok/info di sebelah alamat URL) → Izin → Kamera → Izinkan, lalu muat ulang halaman.');
-        startBtn.disabled = false;
-        startBtn.textContent = '📷 Coba Lagi';
-        return;
-      }
-
       startBtn.textContent = 'Memuat pustaka AR…';
 
-      // 2. Load AFrame + MindAR from the SAME site (no external CDN — avoids network/firewall blocks)
+      // 1. Load AFrame + MindAR from the SAME site (no external CDN — avoids network/firewall blocks)
       try {
         await loadScript('lib/aframe.min.js');
         await loadScript('lib/mindar-image-aframe.prod.js');
@@ -187,6 +175,32 @@
       overlay.style.display = 'block';
       statusEl.style.display = 'block';
       statusEl.textContent = 'Memuat model 3D…';
+
+      // Watchdog: after a few seconds, verify the camera video is actually playing.
+      // If not, surface a clear diagnostic instead of staying silently blank.
+      setTimeout(async function () {
+        const video = document.querySelector('video');
+        const videoOk = video && video.readyState >= 2 && video.videoWidth > 0;
+        if (!videoOk) {
+          let permState = 'tidak diketahui';
+          try {
+            if (navigator.permissions && navigator.permissions.query) {
+              const p = await navigator.permissions.query({ name: 'camera' });
+              permState = p.state; // 'granted' | 'denied' | 'prompt'
+            }
+          } catch (e) { /* not supported on this browser, ignore */ }
+
+          let msg = 'Kamera belum menyala setelah beberapa detik. Status izin kamera: <b>' + permState + '</b>.<br><br>';
+          if (permState === 'denied') {
+            msg += 'Izin kamera diblokir untuk situs ini. Buka ikon gembok/info di sebelah alamat URL browser → Izin situs → Kamera → ubah ke "Izinkan", lalu muat ulang halaman ini.';
+          } else if (!video) {
+            msg += 'Elemen video kamera tidak ditemukan sama sekali di halaman — kemungkinan MindAR gagal start. Coba muat ulang halaman, atau coba browser lain (Chrome versi terbaru).';
+          } else {
+            msg += 'Elemen video ada tapi belum menampilkan gambar (mungkin masih memuat, atau kamera dipakai aplikasi lain). Tutup aplikasi kamera/video call lain yang mungkin masih aktif, lalu muat ulang halaman.';
+          }
+          showError(msg);
+        }
+      }, 6000);
     });
   </script>
 </body>
