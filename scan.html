@@ -4,10 +4,8 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
   <title>AR Scan — Bentuk Molekul</title>
-  <script src="https://cdn.jsdelivr.net/npm/aframe@1.5.0/dist/aframe.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
   <style>
-    html, body { margin: 0; height: 100%; overflow: hidden; font-family: -apple-system,"Segoe UI",Calibri,Roboto,Arial,sans-serif; }
+    html, body { margin: 0; height: 100%; overflow: hidden; font-family: -apple-system,"Segoe UI",Calibri,Roboto,Arial,sans-serif; background:#0b1220; }
     #overlay {
       position: fixed; top: 0; left: 0; right: 0; z-index: 999;
       background: linear-gradient(180deg, rgba(31,56,100,0.92), rgba(31,56,100,0));
@@ -18,83 +16,185 @@
     #status {
       position: fixed; bottom: 18px; left: 50%; transform: translateX(-50%);
       background: rgba(0,0,0,0.65); color: #fff; padding: 8px 16px; border-radius: 20px;
-      font-size: 13px; z-index: 999; transition: opacity 0.3s;
+      font-size: 13px; z-index: 999; transition: opacity 0.3s; max-width: 90%; text-align:center;
     }
     a-scene { width: 100%; height: 100%; }
+
+    #start-screen {
+      position: fixed; inset: 0; z-index: 1000;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      background: #1F3864; color: #fff; text-align: center; padding: 24px;
+    }
+    #start-screen h1 { font-size: 20px; margin: 0 0 10px; }
+    #start-screen p { font-size: 14px; color: #dbe6f5; margin: 0 0 26px; max-width: 320px; line-height: 1.5; }
+    #start-btn {
+      background: #E8A33D; color: #3a2600; border: none; border-radius: 28px;
+      padding: 14px 30px; font-size: 16px; font-weight: 700; cursor: pointer;
+    }
+    #error-box {
+      display: none; position: fixed; inset: 0; z-index: 1001;
+      background: #3a0d0d; color: #ffd7d7; padding: 24px; font-size: 14px; line-height: 1.6;
+      overflow: auto;
+    }
+    #error-box h2 { margin-top: 0; font-size: 16px; }
   </style>
 </head>
 <body>
-  <div id="overlay">
+
+  <div id="start-screen">
+    <h1>🧪 AR Scan — Bentuk Molekul</h1>
+    <p>Ketuk tombol di bawah untuk mengaktifkan kamera AR, lalu arahkan ke gambar molekul pada LKPD.</p>
+    <button id="start-btn">📷 Aktifkan Kamera AR</button>
+  </div>
+
+  <div id="error-box">
+    <h2>Terjadi kendala</h2>
+    <div id="error-text"></div>
+  </div>
+
+  <div id="overlay" style="display:none;">
     <h1>🧪 AR Scan — Bentuk Molekul</h1>
     <p>Arahkan kamera ke salah satu gambar molekul pada LKPD</p>
   </div>
-  <div id="status">Mencari gambar molekul…</div>
+  <div id="status" style="display:none;">Menyiapkan...</div>
 
-  <a-scene
-    mindar-image="imageTargetSrc: targets.mind; autoStart: true; uiScanning: no; uiLoading: no;"
-    color-space="sRGB"
-    renderer="colorManagement: true, physicallyCorrectLights"
-    vr-mode-ui="enabled: false"
-    device-orientation-permission-ui="enabled: true"
-    embedded>
-
-    <a-assets timeout="30000">
-      <a-asset-item id="model-h2o"  src="models/h2o.glb"></a-asset-item>
-      <a-asset-item id="model-nh3"  src="models/nh3.glb"></a-asset-item>
-      <a-asset-item id="model-co2"  src="models/co2.glb"></a-asset-item>
-      <a-asset-item id="model-ch4"  src="models/ch4.glb"></a-asset-item>
-      <a-asset-item id="model-pcl5" src="models/pcl5.glb"></a-asset-item>
-      <a-asset-item id="model-sf6"  src="models/sf6.glb"></a-asset-item>
-    </a-assets>
-
-    <a-camera position="0 0 0" look-controls="enabled: false" cursor="fuse: false" raycaster="near: 10; far: 10000;"></a-camera>
-
-    <a-light type="ambient" color="#ffffff" intensity="0.9"></a-light>
-    <a-light type="directional" color="#ffffff" intensity="0.6" position="1 2 1"></a-light>
-
-    <!-- target 0: H2O -->
-    <a-entity mindar-image-target="targetIndex: 0" data-name="Air (H₂O)">
-      <a-gltf-model rotation="90 0 0" position="0 0 0.05" scale="0.28 0.28 0.28" src="#model-h2o" animation="property: rotation; to: 90 360 0; loop: true; dur: 8000; easing: linear"></a-gltf-model>
-    </a-entity>
-
-    <!-- target 1: NH3 -->
-    <a-entity mindar-image-target="targetIndex: 1" data-name="Amonia (NH₃)">
-      <a-gltf-model rotation="90 0 0" position="0 0 0.05" scale="0.28 0.28 0.28" src="#model-nh3" animation="property: rotation; to: 90 360 0; loop: true; dur: 8000; easing: linear"></a-gltf-model>
-    </a-entity>
-
-    <!-- target 2: CO2 -->
-    <a-entity mindar-image-target="targetIndex: 2" data-name="Karbon dioksida (CO₂)">
-      <a-gltf-model rotation="90 0 0" position="0 0 0.05" scale="0.28 0.28 0.28" src="#model-co2" animation="property: rotation; to: 90 360 0; loop: true; dur: 8000; easing: linear"></a-gltf-model>
-    </a-entity>
-
-    <!-- target 3: CH4 -->
-    <a-entity mindar-image-target="targetIndex: 3" data-name="Metana (CH₄)">
-      <a-gltf-model rotation="90 0 0" position="0 0 0.05" scale="0.28 0.28 0.28" src="#model-ch4" animation="property: rotation; to: 90 360 0; loop: true; dur: 8000; easing: linear"></a-gltf-model>
-    </a-entity>
-
-    <!-- target 4: PCl5 -->
-    <a-entity mindar-image-target="targetIndex: 4" data-name="Fosforus pentaklorida (PCl₅)">
-      <a-gltf-model rotation="90 0 0" position="0 0 0.05" scale="0.24 0.24 0.24" src="#model-pcl5" animation="property: rotation; to: 90 360 0; loop: true; dur: 8000; easing: linear"></a-gltf-model>
-    </a-entity>
-
-    <!-- target 5: SF6 -->
-    <a-entity mindar-image-target="targetIndex: 5" data-name="Sulfur heksafluorida (SF₆)">
-      <a-gltf-model rotation="90 0 0" position="0 0 0.05" scale="0.24 0.24 0.24" src="#model-sf6" animation="property: rotation; to: 90 360 0; loop: true; dur: 8000; easing: linear"></a-gltf-model>
-    </a-entity>
-
-  </a-scene>
+  <div id="scene-container"></div>
 
   <script>
+    const startScreen = document.getElementById('start-screen');
+    const startBtn = document.getElementById('start-btn');
+    const overlay = document.getElementById('overlay');
     const statusEl = document.getElementById('status');
-    const targets = document.querySelectorAll('[mindar-image-target]');
-    targets.forEach(function (el) {
-      el.addEventListener('targetFound', function () {
-        statusEl.textContent = '✅ ' + el.getAttribute('data-name') + ' terdeteksi';
+    const errorBox = document.getElementById('error-box');
+    const errorText = document.getElementById('error-text');
+
+    function showError(msg) {
+      errorBox.style.display = 'block';
+      errorText.innerHTML += '<p>' + msg + '</p>';
+      console.error(msg);
+    }
+
+    window.addEventListener('error', function (e) {
+      showError('Script error: ' + (e.message || e.toString()));
+    });
+
+    function loadScript(src) {
+      return new Promise((resolve, reject) => {
+        const s = document.createElement('script');
+        s.src = src;
+        s.onload = () => resolve(src);
+        s.onerror = () => reject(new Error('Gagal memuat: ' + src));
+        document.head.appendChild(s);
       });
-      el.addEventListener('targetLost', function () {
+    }
+
+    startBtn.addEventListener('click', async function () {
+      startBtn.disabled = true;
+      startBtn.textContent = 'Memeriksa kamera…';
+
+      // 1. Explicitly request camera permission first, with a clear error if denied
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+        stream.getTracks().forEach(t => t.stop()); // release, MindAR will request its own
+      } catch (err) {
+        showError('Izin kamera ditolak atau tidak tersedia: ' + err.message + '<br>Coba: buka menu situs (ikon gembok/info di sebelah alamat URL) → Izin → Kamera → Izinkan, lalu muat ulang halaman.');
+        startBtn.disabled = false;
+        startBtn.textContent = '📷 Coba Lagi';
+        return;
+      }
+
+      startBtn.textContent = 'Memuat pustaka AR…';
+
+      // 2. Load AFrame + MindAR from CDN, with fallback CDN if the first fails
+      try {
+        await loadScript('https://cdn.jsdelivr.net/npm/aframe@1.5.0/dist/aframe.min.js');
+        await loadScript('https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js');
+      } catch (err1) {
+        try {
+          showError('CDN utama gagal, mencoba CDN cadangan…');
+          await loadScript('https://unpkg.com/aframe@1.5.0/dist/aframe.min.js');
+          await loadScript('https://unpkg.com/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js');
+        } catch (err2) {
+          showError('Gagal memuat pustaka AR dari CDN. Periksa koneksi internet gawai. Detail: ' + err2.message);
+          startBtn.disabled = false;
+          startBtn.textContent = '📷 Coba Lagi';
+          return;
+        }
+      }
+
+      startBtn.textContent = 'Menyiapkan adegan AR…';
+
+      // 3. Build the a-scene now that aframe + mindar are ready
+      const sceneHTML = `
+        <a-scene
+          mindar-image="imageTargetSrc: targets.mind; autoStart: true; uiScanning: no; uiLoading: no;"
+          color-space="sRGB"
+          renderer="colorManagement: true, physicallyCorrectLights"
+          vr-mode-ui="enabled: false"
+          embedded>
+
+          <a-assets timeout="30000">
+            <a-asset-item id="model-h2o"  src="models/h2o.glb"></a-asset-item>
+            <a-asset-item id="model-nh3"  src="models/nh3.glb"></a-asset-item>
+            <a-asset-item id="model-co2"  src="models/co2.glb"></a-asset-item>
+            <a-asset-item id="model-ch4"  src="models/ch4.glb"></a-asset-item>
+            <a-asset-item id="model-pcl5" src="models/pcl5.glb"></a-asset-item>
+            <a-asset-item id="model-sf6"  src="models/sf6.glb"></a-asset-item>
+          </a-assets>
+
+          <a-camera position="0 0 0" look-controls="enabled: false" cursor="fuse: false" raycaster="near: 10; far: 10000;"></a-camera>
+
+          <a-light type="ambient" color="#ffffff" intensity="0.9"></a-light>
+          <a-light type="directional" color="#ffffff" intensity="0.6" position="1 2 1"></a-light>
+
+          <a-entity mindar-image-target="targetIndex: 0" data-name="Air (H₂O)">
+            <a-gltf-model rotation="90 0 0" position="0 0 0.05" scale="0.28 0.28 0.28" src="#model-h2o" animation="property: rotation; to: 90 360 0; loop: true; dur: 8000; easing: linear"></a-gltf-model>
+          </a-entity>
+          <a-entity mindar-image-target="targetIndex: 1" data-name="Amonia (NH₃)">
+            <a-gltf-model rotation="90 0 0" position="0 0 0.05" scale="0.28 0.28 0.28" src="#model-nh3" animation="property: rotation; to: 90 360 0; loop: true; dur: 8000; easing: linear"></a-gltf-model>
+          </a-entity>
+          <a-entity mindar-image-target="targetIndex: 2" data-name="Karbon dioksida (CO₂)">
+            <a-gltf-model rotation="90 0 0" position="0 0 0.05" scale="0.28 0.28 0.28" src="#model-co2" animation="property: rotation; to: 90 360 0; loop: true; dur: 8000; easing: linear"></a-gltf-model>
+          </a-entity>
+          <a-entity mindar-image-target="targetIndex: 3" data-name="Metana (CH₄)">
+            <a-gltf-model rotation="90 0 0" position="0 0 0.05" scale="0.28 0.28 0.28" src="#model-ch4" animation="property: rotation; to: 90 360 0; loop: true; dur: 8000; easing: linear"></a-gltf-model>
+          </a-entity>
+          <a-entity mindar-image-target="targetIndex: 4" data-name="Fosforus pentaklorida (PCl₅)">
+            <a-gltf-model rotation="90 0 0" position="0 0 0.05" scale="0.24 0.24 0.24" src="#model-pcl5" animation="property: rotation; to: 90 360 0; loop: true; dur: 8000; easing: linear"></a-gltf-model>
+          </a-entity>
+          <a-entity mindar-image-target="targetIndex: 5" data-name="Sulfur heksafluorida (SF₆)">
+            <a-gltf-model rotation="90 0 0" position="0 0 0.05" scale="0.24 0.24 0.24" src="#model-sf6" animation="property: rotation; to: 90 360 0; loop: true; dur: 8000; easing: linear"></a-gltf-model>
+          </a-entity>
+        </a-scene>
+      `;
+      document.getElementById('scene-container').innerHTML = sceneHTML;
+
+      const sceneEl = document.querySelector('a-scene');
+
+      sceneEl.addEventListener('renderstart', function () {
         statusEl.textContent = 'Mencari gambar molekul…';
       });
+
+      sceneEl.addEventListener('arError', function (e) {
+        showError('MindAR error: ' + JSON.stringify(e.detail));
+      });
+
+      const targets = sceneEl.querySelectorAll('[mindar-image-target]');
+      targets.forEach(function (el) {
+        el.addEventListener('targetFound', function () {
+          statusEl.textContent = '✅ ' + el.getAttribute('data-name') + ' terdeteksi';
+        });
+        el.addEventListener('targetLost', function () {
+          statusEl.textContent = 'Mencari gambar molekul…';
+        });
+      });
+
+      startScreen.style.display = 'none';
+      overlay.style.display = 'block';
+      statusEl.style.display = 'block';
+      statusEl.textContent = 'Memuat model 3D…';
     });
   </script>
 </body>
 </html>
+
